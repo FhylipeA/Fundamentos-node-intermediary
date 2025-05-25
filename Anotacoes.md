@@ -24,3 +24,5 @@
 
 ### Cabeçalhos 
 - sao metadados: informações pra que o o front-end ou back-end saibam lidar com as requisiçoes da melhor forma
+
+
