@@ -1,10 +1,12 @@
 import http from 'node:http'
-import { json } from './middlewares/json.js'
 //se escreve dessa forma para se diferenciar os imports internos do node de instalações e imports de terceiros
+import { randomUUID } from 'node:crypto'
+//função que cria IDs codificados para os novos usuariosS
+import { json } from './middlewares/json.js'
+import { Database } from './middlewares/database.js'
 
 
-const users = []
-//criei uma variavel contante e defino que ela sera um array
+const database = new Database()
 
 const server = http.createServer(async (req, res) => {
     //metodo de criação do servidor usando essa função do http que recebe uma arrow function como unico parametro
@@ -20,8 +22,9 @@ const server = http.createServer(async (req, res) => {
 
 
     if (method == 'GET' && url == '/users') {
-        return res
-        .end(JSON.stringify(users))
+        const users = database.select('users') //pega os dados que vem da tabela de usuarios 
+
+        return res.end(JSON.stringify(users))
         //como o resposta nao pode ser de qualquer tipo entao se usa o JSON para transformar o array em uma string que pode ser lida corretamente
     }
     //se a requisição for do tipo GET e a url for /users, então o retorna a msg acima
@@ -30,11 +33,13 @@ const server = http.createServer(async (req, res) => {
         const {name, email} = req.body
         //agr que foi definido o que é o body e como ele vai funcionar eu posso desestruturar ele pra pegar os dados que quero sendo enviados da requisição
 
-        users.push({
-            id:1,
+        const user = {
+            id:randomUUID(), //simplesmente chama a função onde cria o ID
             name,
             email
-        })
+        } // agr eu estou disendo como vai ser o meu dado
+
+        database.insert('users', user) //ativando a função insert dizendo qual a inha tabela e qual o dado que vou receber
 
         return res.writeHead(201).end('Criação de usuários')
         // é o metodo utilizado para indicar qual a resposta esperada para aqueal requisição
